@@ -81,7 +81,7 @@ namespace COH3ReplayManager
                 var fi = new FileInfo(ReplayHelper.coh3PlaybackPath + $"\\{item.Text}");
                 if (fi.Exists)
                 {
-                    Process.Start(ReplayHelper.coh3Path, $"-replay playback:{item.Text}");
+                    Process.Start(ReplayHelper.coh3Path, $"-dev -replay playback:{item.Text}");
                 }
             }
         }
