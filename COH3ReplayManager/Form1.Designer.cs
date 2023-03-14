@@ -41,17 +41,21 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.lblReplayInfo = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // listView1
             // 
             this.listView1.Location = new System.Drawing.Point(12, 27);
+            this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(291, 498);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.List;
+            this.listView1.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
             this.listView1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseDoubleClick);
             // 
             // notifyIcon1
@@ -71,7 +75,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(584, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(787, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -134,11 +138,31 @@
             this.label4.TabIndex = 5;
             this.label4.Text = "Speed (ticks/second, default 8): setsimrate(x)";
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label5.Location = new System.Drawing.Point(309, 133);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(114, 15);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "Replay Information";
+            // 
+            // lblReplayInfo
+            // 
+            this.lblReplayInfo.AutoSize = true;
+            this.lblReplayInfo.Location = new System.Drawing.Point(309, 157);
+            this.lblReplayInfo.Name = "lblReplayInfo";
+            this.lblReplayInfo.Size = new System.Drawing.Size(0, 15);
+            this.lblReplayInfo.TabIndex = 7;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(584, 537);
+            this.ClientSize = new System.Drawing.Size(787, 537);
+            this.Controls.Add(this.lblReplayInfo);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -151,7 +175,6 @@
             this.MinimizeBox = false;
             this.Name = "Form1";
             this.ShowIcon = false;
-            this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "COH 3 Replay Manager";
@@ -178,5 +201,7 @@
         private Label label2;
         private Label label3;
         private Label label4;
+        private Label label5;
+        private Label lblReplayInfo;
     }
 }
