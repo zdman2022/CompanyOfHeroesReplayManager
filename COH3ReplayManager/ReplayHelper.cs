@@ -64,6 +64,12 @@ namespace COH3ReplayManager
 
         internal static List<string> GetReplays()
         {
+            if (!Directory.Exists(coh3PlaybackPath))
+            {
+                MessageBox.Show("Unable to find path to replays.  You may need to set the path in the configuraiton file.");
+                return new List<string>();
+            }
+
             DirectoryInfo info = new DirectoryInfo(coh3PlaybackPath);
             var files = info.GetFiles().Where(item => item.Name.ToLower() != fileName && item.Name.ToLower() != fileNameCampaign).OrderByDescending(p => p.CreationTime).ToList();
 

@@ -84,6 +84,10 @@ namespace COH3ReplayManager
                 {
                     Process.Start(ReplayHelper.coh3Path, $"-dev -replay playback:{item.Text}");
                 }
+                else
+                {
+                    MessageBox.Show("Unable to find COH3 exe.  You may need to set it in the configuration file.");
+                }
             }
         }
 
