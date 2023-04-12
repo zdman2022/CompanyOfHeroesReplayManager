@@ -12,12 +12,12 @@ namespace COH3ReplayManager
 
         private void Form1_Load(object sender, EventArgs e)
         {
-           
+            lblReplayInfo.Text = string.Empty;
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if(ReplayHelper.IsRunning)
+            if (ReplayHelper.IsRunning)
             {
                 if (File.Exists(ReplayHelper.ReplayFile))
                 {
@@ -53,7 +53,7 @@ namespace COH3ReplayManager
 
         private void Form1_VisibleChanged(object sender, EventArgs e)
         {
-            if(this.Visible)
+            if (this.Visible)
             {
                 var files = ReplayHelper.GetReplays();
 
@@ -82,11 +82,13 @@ namespace COH3ReplayManager
                 var fi = new FileInfo(ReplayHelper.coh3PlaybackPath + $"\\{item.Text}");
                 if (fi.Exists)
                 {
-                    Process.Start(ReplayHelper.coh3Path, $"-dev -replay playback:{item.Text}");
+                    //Process.Start(ReplayHelper.coh3Path, $"-dev -replay playback:{item.Text}");
+                    Process.Start(ReplayHelper.steamPath, $"-appLaunch 1677280 -dev -replay playback:{item.Text}");
+                    //Clipboard.SetText($"-dev -replay playback:{item.Text}");
                 }
                 else
                 {
-                    MessageBox.Show("Unable to find COH3 exe.  You may need to set it in the configuration file.");
+                    MessageBox.Show("Unable to find COH3 playback path.  You may need to set it in the configuration file.");
                 }
             }
         }
@@ -104,7 +106,7 @@ namespace COH3ReplayManager
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
             lblReplayInfo.Text = "";
-            if(this.listView1.SelectedItems.Count == 0) return;
+            if (this.listView1.SelectedItems.Count == 0) return;
 
             var item = this.listView1.SelectedItems[0];
 
@@ -112,7 +114,7 @@ namespace COH3ReplayManager
             if (fi.Exists)
             {
                 using (var fs = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                { 
+                {
                     var data = new byte[fs.Length];
                     fs.Read(data, 0, data.Length);
 
@@ -165,7 +167,8 @@ namespace COH3ReplayManager
                         pos = dataHex.IndexOf(playerSearch, pos + playerSearch.Length);
                     }
 
-                    foreach(var player in players) {
+                    foreach (var player in players)
+                    {
                         lblReplayInfo.Text += $"Player: {player.Name} ({player.Faction})" + Environment.NewLine;
                     }
 
@@ -174,12 +177,12 @@ namespace COH3ReplayManager
                     //Get Map
                     string mapSearch = BitConverter.ToString(Encoding.Default.GetBytes("data:")).Replace("-", "");
                     pos = dataHex.IndexOf(mapSearch);
-                    if(pos != -1)
+                    if (pos != -1)
                     {
                         pos += 10;
                         var map = "";
 
-                        while(dataHex.Substring(pos, 2) != "09")
+                        while (dataHex.Substring(pos, 2) != "09")
                         {
                             map += dataHex.Substring(pos, 2);
                             pos += 2;
@@ -200,6 +203,59 @@ namespace COH3ReplayManager
                 raw[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
             }
             return raw;
+        }
+
+        private void replayEnhancementsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Openurl("https://github.com/Janne252/coh3-replay-enhancements");
+        }
+
+        private void Openurl(string url)
+        {
+            var psi = new System.Diagnostics.ProcessStartInfo();
+            psi.UseShellExecute = true;
+            psi.FileName = url;
+            Process.Start(psi);
+        }
+
+        private void cOHDBToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Openurl("https://cohdb.com/");
+        }
+
+        private void cOH3StatsDesktopAppToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Openurl("https://github.com/cohstats/coh3-stats-desktop-app");
+        }
+
+        private void cOH3StatsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Openurl("https://coh3stats.com/");
+        }
+
+        private void btnFOW_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText("FOW_UIRevealAll");
+        }
+
+        private void btnUnFOW_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText("FOW_UIUnRevealAll");
+        }
+
+        private void btnSpeed16_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText("setsimrate(16)");
+        }
+
+        private void btnSpeed24_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText("setsimrate(24)");
+        }
+
+        private void btnEnhancements_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText("dofile('replay-enhancements/init.scar')");
         }
     }
 }

@@ -5,6 +5,14 @@ namespace COH3ReplayManager
 {
     internal static class ReplayHelper
     {
+        public static string steamPath
+        {
+            get
+            {
+                return GetValue("SteamPath", "C:\\Program Files (x86)\\Steam\\steam.exe");
+            }
+        }
+
         public static string myDocuments
         {
             get
