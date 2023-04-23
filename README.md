@@ -20,5 +20,6 @@ How to setup to automatically run:
 * Open the startup folder (Windows logo key + r, type shell:startup, then select OK)
 * Copy and paste (or drag) the shortcut file to the Startup folder
 
-![Alt text](/images/COH3RM_SS_1.png "Icon Image")
-![Alt text](/images/COH3RM_SS_2.png "App Image")
+![Alt text](https://raw.githubusercontent.com/zdman2022/CompanyOfHeroesReplayManager/main/COH3ReplayManager/Images/COH3RM_SS_1.png "Icon Image")
+
+![Alt text](https://raw.githubusercontent.com/zdman2022/CompanyOfHeroesReplayManager/main/COH3ReplayManager/Images/COH3RM_SS_2.png "App Image")
