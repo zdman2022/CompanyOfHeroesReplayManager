@@ -11,9 +11,7 @@ Features
 Pre-Req: .NET 7.0 runtime (Download the runtime from https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
 
 Configuration
-* Edit COH3ReplayManager.dll.config in a text editor
-* Set the value of COH3Path to the path to your COH3 exe
-* You can explicitly set where to find the replays by setting COH3PlaybackPath.  I'm not sure if this is useful but it's there if needed.
+* Change paths to Steam or the COH3 replay path under File -> Settings.
 
 How to setup to automatically run:
 
