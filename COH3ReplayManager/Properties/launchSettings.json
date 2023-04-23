@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "COH3ReplayManager": {
+      "commandName": "Project",
+      //"commandLineArgs": "coh3-play-replay:https://cohdb.com/replays/106/download"
+    }
+  }
+}

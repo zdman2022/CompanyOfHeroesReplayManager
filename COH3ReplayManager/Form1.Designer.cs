@@ -36,24 +36,32 @@
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             openReplayFolderToolStripMenuItem = new ToolStripMenuItem();
+            settingsToolStripMenuItem1 = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
             externalLinksToolStripMenuItem = new ToolStripMenuItem();
             replayEnhancementsToolStripMenuItem = new ToolStripMenuItem();
             cOHDBToolStripMenuItem = new ToolStripMenuItem();
             cOH3StatsDesktopAppToolStripMenuItem = new ToolStripMenuItem();
             cOH3StatsToolStripMenuItem = new ToolStripMenuItem();
+            settingsToolStripMenuItem = new ToolStripMenuItem();
+            setReplayLinkToolStripMenuItem = new ToolStripMenuItem();
             label1 = new Label();
             label2 = new Label();
             label3 = new Label();
             label4 = new Label();
             label5 = new Label();
-            lblReplayInfo = new Label();
             label6 = new Label();
             btnFOW = new Button();
             btnUnFOW = new Button();
             btnSpeed16 = new Button();
             btnSpeed24 = new Button();
             btnEnhancements = new Button();
+            btnRefresh = new Button();
+            lblVersion = new Label();
+            lblTimestamp = new Label();
+            lblMap = new Label();
+            flpPlayers = new FlowLayoutPanel();
+            label10 = new Label();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -62,7 +70,7 @@
             listView1.Location = new Point(12, 27);
             listView1.MultiSelect = false;
             listView1.Name = "listView1";
-            listView1.Size = new Size(291, 498);
+            listView1.Size = new Size(269, 498);
             listView1.TabIndex = 0;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.List;
@@ -83,7 +91,7 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, externalLinksToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, externalLinksToolStripMenuItem, settingsToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(787, 24);
@@ -92,7 +100,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openReplayFolderToolStripMenuItem, exitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openReplayFolderToolStripMenuItem, settingsToolStripMenuItem1, exitToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(37, 20);
             fileToolStripMenuItem.Text = "&File";
@@ -103,6 +111,13 @@
             openReplayFolderToolStripMenuItem.Size = new Size(177, 22);
             openReplayFolderToolStripMenuItem.Text = "&Open Replay Folder";
             openReplayFolderToolStripMenuItem.Click += openReplayFolderToolStripMenuItem_Click;
+            // 
+            // settingsToolStripMenuItem1
+            // 
+            settingsToolStripMenuItem1.Name = "settingsToolStripMenuItem1";
+            settingsToolStripMenuItem1.Size = new Size(180, 22);
+            settingsToolStripMenuItem1.Text = "&Settings";
+            settingsToolStripMenuItem1.Click += settingsToolStripMenuItem1_Click;
             // 
             // exitToolStripMenuItem
             // 
@@ -116,7 +131,7 @@
             externalLinksToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { replayEnhancementsToolStripMenuItem, cOHDBToolStripMenuItem, cOH3StatsDesktopAppToolStripMenuItem, cOH3StatsToolStripMenuItem });
             externalLinksToolStripMenuItem.Name = "externalLinksToolStripMenuItem";
             externalLinksToolStripMenuItem.Size = new Size(91, 20);
-            externalLinksToolStripMenuItem.Text = "External Links";
+            externalLinksToolStripMenuItem.Text = "External &Links";
             // 
             // replayEnhancementsToolStripMenuItem
             // 
@@ -145,6 +160,20 @@
             cOH3StatsToolStripMenuItem.Size = new Size(205, 22);
             cOH3StatsToolStripMenuItem.Text = "COH3 Stats";
             cOH3StatsToolStripMenuItem.Click += cOH3StatsToolStripMenuItem_Click;
+            // 
+            // settingsToolStripMenuItem
+            // 
+            settingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { setReplayLinkToolStripMenuItem });
+            settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            settingsToolStripMenuItem.Size = new Size(45, 20);
+            settingsToolStripMenuItem.Text = "&Extra";
+            // 
+            // setReplayLinkToolStripMenuItem
+            // 
+            setReplayLinkToolStripMenuItem.Name = "setReplayLinkToolStripMenuItem";
+            setReplayLinkToolStripMenuItem.Size = new Size(180, 22);
+            setReplayLinkToolStripMenuItem.Text = "Set &Replay Link";
+            setReplayLinkToolStripMenuItem.Click += setReplayLinkToolStripMenuItem_Click;
             // 
             // label1
             // 
@@ -191,15 +220,6 @@
             label5.Size = new Size(114, 15);
             label5.TabIndex = 6;
             label5.Text = "Replay Information";
-            // 
-            // lblReplayInfo
-            // 
-            lblReplayInfo.AutoSize = true;
-            lblReplayInfo.Location = new Point(309, 186);
-            lblReplayInfo.Name = "lblReplayInfo";
-            lblReplayInfo.Size = new Size(66, 15);
-            lblReplayInfo.TabIndex = 7;
-            lblReplayInfo.Text = "Replay Info";
             // 
             // label6
             // 
@@ -265,18 +285,76 @@
             btnEnhancements.UseVisualStyleBackColor = true;
             btnEnhancements.Click += btnEnhancements_Click;
             // 
+            // btnRefresh
+            // 
+            btnRefresh.Location = new Point(287, 27);
+            btnRefresh.Name = "btnRefresh";
+            btnRefresh.Size = new Size(24, 23);
+            btnRefresh.TabIndex = 14;
+            btnRefresh.UseVisualStyleBackColor = true;
+            btnRefresh.Click += btnRefresh_Click;
+            // 
+            // lblVersion
+            // 
+            lblVersion.AutoSize = true;
+            lblVersion.Location = new Point(309, 186);
+            lblVersion.Name = "lblVersion";
+            lblVersion.Size = new Size(48, 15);
+            lblVersion.TabIndex = 15;
+            lblVersion.Text = "Version:";
+            // 
+            // lblTimestamp
+            // 
+            lblTimestamp.AutoSize = true;
+            lblTimestamp.Location = new Point(309, 212);
+            lblTimestamp.Name = "lblTimestamp";
+            lblTimestamp.Size = new Size(69, 15);
+            lblTimestamp.TabIndex = 16;
+            lblTimestamp.Text = "Timestamp:";
+            // 
+            // lblMap
+            // 
+            lblMap.AutoSize = true;
+            lblMap.Location = new Point(310, 243);
+            lblMap.Name = "lblMap";
+            lblMap.Size = new Size(34, 15);
+            lblMap.TabIndex = 17;
+            lblMap.Text = "Map:";
+            // 
+            // flpPlayers
+            // 
+            flpPlayers.FlowDirection = FlowDirection.TopDown;
+            flpPlayers.Location = new Point(338, 304);
+            flpPlayers.Name = "flpPlayers";
+            flpPlayers.Size = new Size(437, 221);
+            flpPlayers.TabIndex = 18;
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new Point(310, 275);
+            label10.Name = "label10";
+            label10.Size = new Size(47, 15);
+            label10.TabIndex = 19;
+            label10.Text = "Players:";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(787, 537);
+            Controls.Add(label10);
+            Controls.Add(flpPlayers);
+            Controls.Add(lblMap);
+            Controls.Add(lblTimestamp);
+            Controls.Add(lblVersion);
+            Controls.Add(btnRefresh);
             Controls.Add(btnEnhancements);
             Controls.Add(btnSpeed24);
             Controls.Add(btnSpeed16);
             Controls.Add(btnUnFOW);
             Controls.Add(btnFOW);
             Controls.Add(label6);
-            Controls.Add(lblReplayInfo);
             Controls.Add(label5);
             Controls.Add(label4);
             Controls.Add(label3);
@@ -316,7 +394,6 @@
         private Label label3;
         private Label label4;
         private Label label5;
-        private Label lblReplayInfo;
         private Label label6;
         private ToolStripMenuItem externalLinksToolStripMenuItem;
         private ToolStripMenuItem replayEnhancementsToolStripMenuItem;
@@ -328,5 +405,14 @@
         private Button btnSpeed16;
         private Button btnSpeed24;
         private Button btnEnhancements;
+        private ToolStripMenuItem settingsToolStripMenuItem;
+        private ToolStripMenuItem setReplayLinkToolStripMenuItem;
+        private Button btnRefresh;
+        private Label lblVersion;
+        private Label lblTimestamp;
+        private Label lblMap;
+        private FlowLayoutPanel flpPlayers;
+        private Label label10;
+        private ToolStripMenuItem settingsToolStripMenuItem1;
     }
 }

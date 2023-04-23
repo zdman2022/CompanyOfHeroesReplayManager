@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text;
 
@@ -8,11 +9,13 @@ namespace COH3ReplayManager
         public Form1()
         {
             InitializeComponent();
+
+            btnRefresh.Font = new Font("Wingdings 3", 10, FontStyle.Bold);
+            btnRefresh.Text = Char.ConvertFromUtf32(81);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            lblReplayInfo.Text = string.Empty;
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -55,14 +58,19 @@ namespace COH3ReplayManager
         {
             if (this.Visible)
             {
-                var files = ReplayHelper.GetReplays();
-
-                listView1.Items.Clear();
-                listView1.Items.AddRange(files.Select(item => new ListViewItem
-                {
-                    Text = Path.GetFileName(item)
-                }).ToArray());
+                refreshList();
             }
+        }
+
+        private void refreshList()
+        {
+            var files = ReplayHelper.GetReplays();
+
+            listView1.Items.Clear();
+            listView1.Items.AddRange(files.Select(item => new ListViewItem
+            {
+                Text = Path.GetFileName(item)
+            }).ToArray());
         }
 
         private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -79,17 +87,30 @@ namespace COH3ReplayManager
 
             if (!ReplayHelper.IsRunning)
             {
-                var fi = new FileInfo(ReplayHelper.coh3PlaybackPath + $"\\{item.Text}");
-                if (fi.Exists)
+                var steamFI = new FileInfo(ReplayHelper.steamPath);
+
+                if (steamFI.Exists)
                 {
-                    //Process.Start(ReplayHelper.coh3Path, $"-dev -replay playback:{item.Text}");
-                    Process.Start(ReplayHelper.steamPath, $"-appLaunch 1677280 -dev -replay playback:{item.Text}");
-                    //Clipboard.SetText($"-dev -replay playback:{item.Text}");
+                    var fi = new FileInfo(ReplayHelper.coh3PlaybackPath + $"\\{item.Text}");
+                    if (fi.Exists)
+                    {
+                        //Process.Start(ReplayHelper.coh3Path, $"-dev -replay playback:{item.Text}");
+                        Process.Start(ReplayHelper.steamPath, $"-appLaunch 1677280 -dev -replay playback:{item.Text}");
+                        //Clipboard.SetText($"-dev -replay playback:{item.Text}");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Unable to find COH3 playback path.  You may need to set it settings.");
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Unable to find COH3 playback path.  You may need to set it in the configuration file.");
+                    MessageBox.Show("Steam not found.  You may need to set it in settings.");
                 }
+            }
+            else
+            {
+                MessageBox.Show("COH3 is already running.");
             }
         }
 
@@ -105,7 +126,11 @@ namespace COH3ReplayManager
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            lblReplayInfo.Text = "";
+            lblVersion.Text = "Version:";
+            lblTimestamp.Text = "Timestamp:";
+            lblMap.Text = "Map:";
+            flpPlayers.Controls.Clear();
+
             if (this.listView1.SelectedItems.Count == 0) return;
 
             var item = this.listView1.SelectedItems[0];
@@ -113,85 +138,131 @@ namespace COH3ReplayManager
             var fi = new FileInfo(ReplayHelper.coh3PlaybackPath + $"\\{item.Text}");
             if (fi.Exists)
             {
-                using (var fs = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                Process p = new Process();
+                p.StartInfo.FileName = "flank.exe";
+                p.StartInfo.Arguments = $"\"{fi.FullName}\"";
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.CreateNoWindow = true;
+                p.Start();
+
+                var bldr = new StringBuilder();
+                while (!p.StandardOutput.EndOfStream)
                 {
-                    var data = new byte[fs.Length];
-                    fs.Read(data, 0, data.Length);
+                    bldr.AppendLine(p.StandardOutput.ReadLine());
+                }
 
-                    string dataHex = BitConverter.ToString(data).Replace("-", "");
+                var json = bldr.ToString();
 
-                    string playerSearch = BitConverter.ToString(Encoding.Default.GetBytes("default_ai_personality")).Replace("-", "");
+                var replayData = json != null && !string.IsNullOrWhiteSpace(json) ? JsonConvert.DeserializeObject<ReplayData>(json) : null;
 
-                    //Get Players
-                    var players = new List<Player>();
-                    var pos = dataHex.IndexOf(playerSearch);
-                    while (pos != -1)
+                if (replayData != null)
+                {
+                    lblVersion.Text = $"Version: {replayData.version}" + Environment.NewLine;
+                    lblTimestamp.Text = $"Timestamp: {replayData.timestamp}" + Environment.NewLine;
+                    lblMap.Text = $"Map: {replayData.map.filename.Substring(replayData.map.filename.LastIndexOf("\\") + 1)}" + Environment.NewLine;
+
+                    flpPlayers.Controls.Clear();
+                    foreach (var player in replayData.players)
                     {
-                        var curPos = pos - 2;
-
-
-                        while (dataHex.Substring(curPos, 2) != "22")
+                        var lbl = new LinkLabel();
+                        lbl.Text = $"{player.name} - {player.faction}";
+                        lbl.Width = 300;
+                        lbl.Click += (s, e) =>
                         {
-                            curPos = curPos - 2;
-                        }
-
-                        var faction = "";
-
-                        curPos -= 4;
-                        while (!faction.StartsWith("0000"))
-                        {
-                            curPos -= 2;
-                            faction = dataHex.Substring(curPos, 2) + faction;
-                        }
-
-                        faction = faction.Replace("00", "");
-                        faction = Encoding.ASCII.GetString(FromHex(faction));
-
-                        var playerName = "";
-                        curPos -= 24;
-                        while (!playerName.StartsWith("0000"))
-                        {
-                            curPos -= 2;
-                            playerName = dataHex.Substring(curPos, 2) + playerName;
-                        }
-
-                        playerName = playerName.Replace("00", "");
-                        playerName = Encoding.ASCII.GetString(FromHex(playerName));
-
-                        players.Add(new Player
-                        {
-                            Name = playerName,
-                            Faction = faction
-                        });
-
-                        pos = dataHex.IndexOf(playerSearch, pos + playerSearch.Length);
-                    }
-
-                    foreach (var player in players)
-                    {
-                        lblReplayInfo.Text += $"Player: {player.Name} ({player.Faction})" + Environment.NewLine;
-                    }
-
-                    lblReplayInfo.Text += Environment.NewLine;
-
-                    //Get Map
-                    string mapSearch = BitConverter.ToString(Encoding.Default.GetBytes("data:")).Replace("-", "");
-                    pos = dataHex.IndexOf(mapSearch);
-                    if (pos != -1)
-                    {
-                        pos += 10;
-                        var map = "";
-
-                        while (dataHex.Substring(pos, 2) != "09")
-                        {
-                            map += dataHex.Substring(pos, 2);
-                            pos += 2;
-                        }
-
-                        map = Encoding.ASCII.GetString(FromHex(map));
-                        lblReplayInfo.Text += $"Map: {map}" + Environment.NewLine;
+                            Process.Start(new ProcessStartInfo($"https://coh3stats.com/players/{player.profile_id}") { UseShellExecute = true });
+                        };
+                        flpPlayers.Controls.Add(lbl);
                     }
                 }
+                else
+                {
+                    lblVersion.Text = "Version: Unable to parse replay.";
+                    lblTimestamp.Text = "Timestamp:";
+                    lblMap.Text = "Map:";
+                    flpPlayers.Controls.Clear();
+                }
+
+
+                //using (var fs = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                //{
+                //    var data = new byte[fs.Length];
+                //    fs.Read(data, 0, data.Length);
+
+                //    string dataHex = BitConverter.ToString(data).Replace("-", "");
+
+                //    string playerSearch = BitConverter.ToString(Encoding.Default.GetBytes("default_ai_personality")).Replace("-", "");
+
+                //    //Get Players
+                //    var players = new List<Player>();
+                //    var pos = dataHex.IndexOf(playerSearch);
+                //    while (pos != -1)
+                //    {
+                //        var curPos = pos - 2;
+
+
+                //        while (dataHex.Substring(curPos, 2) != "22")
+                //        {
+                //            curPos = curPos - 2;
+                //        }
+
+                //        var faction = "";
+
+                //        curPos -= 4;
+                //        while (!faction.StartsWith("0000"))
+                //        {
+                //            curPos -= 2;
+                //            faction = dataHex.Substring(curPos, 2) + faction;
+                //        }
+
+                //        faction = faction.Replace("00", "");
+                //        faction = Encoding.ASCII.GetString(FromHex(faction));
+
+                //        var playerName = "";
+                //        curPos -= 24;
+                //        while (!playerName.StartsWith("0000"))
+                //        {
+                //            curPos -= 2;
+                //            playerName = dataHex.Substring(curPos, 2) + playerName;
+                //        }
+
+                //        playerName = playerName.Replace("00", "");
+                //        playerName = Encoding.ASCII.GetString(FromHex(playerName));
+
+                //        players.Add(new Player
+                //        {
+                //            Name = playerName,
+                //            Faction = faction
+                //        });
+
+                //        pos = dataHex.IndexOf(playerSearch, pos + playerSearch.Length);
+                //    }
+
+                //    foreach (var player in players)
+                //    {
+                //        lblReplayInfo.Text += $"Player: {player.Name} ({player.Faction})" + Environment.NewLine;
+                //    }
+
+                //    lblReplayInfo.Text += Environment.NewLine;
+
+                //    //Get Map
+                //    string mapSearch = BitConverter.ToString(Encoding.Default.GetBytes("data:")).Replace("-", "");
+                //    pos = dataHex.IndexOf(mapSearch);
+                //    if (pos != -1)
+                //    {
+                //        pos += 10;
+                //        var map = "";
+
+                //        while (dataHex.Substring(pos, 2) != "09")
+                //        {
+                //            map += dataHex.Substring(pos, 2);
+                //            pos += 2;
+                //        }
+
+                //        map = Encoding.ASCII.GetString(FromHex(map));
+                //        lblReplayInfo.Text += $"Map: {map}" + Environment.NewLine;
+                //    }
+                //}
             }
         }
 
@@ -256,6 +327,22 @@ namespace COH3ReplayManager
         private void btnEnhancements_Click(object sender, EventArgs e)
         {
             Clipboard.SetText("dofile('replay-enhancements/init.scar')");
+        }
+
+        private void setReplayLinkToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ReplayHelper.RegisterUriScheme();
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            refreshList();
+        }
+
+        private void settingsToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var settingsForm = new Settings();
+            settingsForm.ShowDialog();
         }
     }
 }
